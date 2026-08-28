@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raise IT Ticket</title>
+</head>
+<body>
+    <h2>IT Ticket Request Form</h2>
+    <form method="POST">
+        <label>Request Type:</label><br>
+        <select name="ticket_type" required>
+            <option value="Allocation">Allocation</option>
+            <option value="Deallocation">Deallocation</option>
+            <option value="Issue">Issue</option>
+        </select><br><br>
+
+        <label>User Name:</label><br>
+        <input type="text" name="user_name" required><br><br>
+
+        <label>Staff ID:</label><br>
+        <input type="text" name="staff_id" required><br><br>
+
+        <label>Official Email ID:</label><br>
+        <input type="email" name="official_email" required><br><br>
+
+        <label>Client Email ID:</label><br>
+        <input type="email" name="client_email"><br><br>
+
+        <label>Location:</label><br>
+        <input type="text" name="location" required><br><br>
+
+        <label>RM Name:</label><br>
+        <input type="text" name="rm_name" required><br><br>
+
+        <button type="submit">Submit Ticket</button>
+    </form>
+</body>
+</html>

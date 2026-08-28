@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IT Admin Dashboard</title>
+</head>
+<body>
+    <h2>IT Tickets Dashboard</h2>
+    <a href="/raise-ticket">Raise New Ticket</a>
+    <br><br>
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>User</th>
+            <th>Staff ID</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.ticket_type }}</td>
+            <td>{{ ticket.user_name }}</td>
+            <td>{{ ticket.staff_id }}</td>
+            <td><b>{{ ticket.status }}</b></td>
+            <td>
+                <form action="/update-ticket/{{ ticket.id }}" method="POST">
+                    <select name="status">
+                        <option value="Pending" {% if ticket.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="In-Progress" {% if ticket.status == 'In-Progress' %}selected{% endif %}>In-Progress</option>
+                        <option value="Resolved" {% if ticket.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <input type="text" name="assigned_desktop" placeholder="Desktop ID" value="{{ ticket.assigned_desktop or '' }}">
+                    <input type="text" name="assigned_model" placeholder="Model" value="{{ ticket.assigned_model or '' }}">
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
