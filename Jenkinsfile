@@ -4,16 +4,19 @@ pipeline {
     environment {
         IMAGE_NAME = 'ticketing-system'
         IMAGE_TAG = "v${BUILD_NUMBER}"
+        KUBECONFIG = '/var/jenkins_home/.kube/config'
     }
 
     stages {
         stage('Checkout Code') {
-            steps {
-                // Git Repository-யில் இருந்து கோடைத் திரும்பப் பெறுதல்
-                checkout scm
+             stage('Checkout') {
+                steps {
+                    git branch: 'main',
+                        url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
+                        credentialsId: 'Pradeep'
+                }
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
