@@ -9,13 +9,11 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            checkout([$class: 'GitSCM',
-                branches: [[name: '*/main']],
-                userRemoteConfigs: [[
-                    url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
+            steps{
+                git branch: 'main',
+                url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
                     credentialsId: 'Git-build'
-                ]]
-            ])
+            }
         }
         stage('Build Docker Image') {
             steps {
