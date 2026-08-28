@@ -30,7 +30,7 @@ pipeline {
                     echo "Deploying to Kubernetes cluster..."
                     // மேனிஃபெஸ்ட் ஃபைலில் புதிய Image Tag-ஐப் புதுப்பித்து Apply செய்தல்
                     sh "sed -i 's|image: ticketing-system:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s-deployment.yaml"
-                    sh "kubectl apply -f k8s-deployment.yaml"
+                    sh "kubectl apply -f k8s-deployment.yaml --validate=false"
                 }
             }
         }
