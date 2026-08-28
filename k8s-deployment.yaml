@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: ticketing-system
-        image: ticketing-system:v2 # அல்லது உங்கள் Docker Hub/Registry image name
+        image: ticketing-system:v1 # அல்லது உங்கள் Docker Hub/Registry image name
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
