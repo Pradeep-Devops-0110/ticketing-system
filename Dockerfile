@@ -1,18 +1,19 @@
-# Base Image: Python 3.9
-FROM python:3.9-slim
+# Stage 1: Python App
+FROM python:3.9-slim AS python-app
 
-# Set Working Directory
 WORKDIR /app
-
-# Copy Requirements and Install Dependencies
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy All Project Files
 COPY . .
-
-# Expose Port 5000
 EXPOSE 5000
-
-# Run Application
 CMD ["python", "run.py"]
+
+# Stage 2: Jenkins with kubectl
+FROM jenkins/jenkins:lts
+
+USER root
+RUN apt-get update && apt-get install -y docker.io curl \
+    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+USER jenkins
