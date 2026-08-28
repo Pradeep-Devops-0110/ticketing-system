@@ -9,14 +9,12 @@ pipeline {
 
     stages {
         stage('Checkout Code') {
-             stage('Checkout') {
                 steps {
                     git branch: 'main',
                         url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
-                        credentialsId: 'Pradeep'
+                        credentialsId: 'pradeep'
                 }
             }
-        }
         stage('Build Docker Image') {
             steps {
                 script {
