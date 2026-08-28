@@ -8,18 +8,15 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-                steps {
-                    $class: 'GitSCM',
-                        branches: scm.branches,
-                        extensions: [[$class: 'WipeWorkspace']],
-                        userRemoteConfigs: scm.userRemoteConfigs
-                        git branch: 'main',
-                        url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
-                        credentialsId: 'Git-build'
-                        
-                }
-            }
+        stage('Checkout') {
+        checkout([$class: 'GitSCM',
+            branches: [[name: '*/main']],
+            userRemoteConfigs: [[
+                url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
+                credentialsId: 'Git-build'
+            ]]
+        ])
+    }
         stage('Build Docker Image') {
             steps {
                 script {
