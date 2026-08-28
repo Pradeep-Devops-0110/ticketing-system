@@ -5,11 +5,13 @@ pipeline {
         IMAGE_NAME = 'ticketing-system'
         IMAGE_TAG = "v${BUILD_NUMBER}"
         KUBECONFIG = '/var/jenkins_home/.kube/config'
+        GIT_CONFIG_PARAMETERS = "'safe.directory=*'"
     }
 
     stages {
         stage('Checkout') {
             steps{
+                deleteDir()
                 git branch: 'main',
                 url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
                     credentialsId: 'Git-build'
