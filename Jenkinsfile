@@ -27,13 +27,6 @@ pipeline {
             }
         }
 
-        stage('debug'){
-            steps{
-                sh 'pwd'
-                sh 'ls -a'
-                sh 'find , --name "*.yaml"'
-            }
-        }
         stage('Deploy to Kubernetes') {
             steps {
                 script {

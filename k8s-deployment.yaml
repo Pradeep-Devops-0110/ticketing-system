@@ -34,3 +34,21 @@ spec:
       port: 5000
       targetPort: 5000
       nodePort: 30007
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticketing-system-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ticketingsystem.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticketing-system-service
+            port:
+              number: 5000
