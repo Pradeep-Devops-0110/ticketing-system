@@ -27,6 +27,12 @@ pipeline {
             }
         }
 
+        stage('debug'){
+            steps{
+                bat 'dir'
+                bat 'dir k8s'
+            }
+        }
         stage('Deploy to Kubernetes') {
             steps {
                 script {
