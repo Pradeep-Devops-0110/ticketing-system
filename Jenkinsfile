@@ -29,8 +29,9 @@ pipeline {
 
         stage('debug'){
             steps{
-                bat 'dir'
-                bat 'dir k8s'
+                sh 'pwd'
+                sh 'ls-a'
+                sh 'find , --name "*.yaml"'
             }
         }
         stage('Deploy to Kubernetes') {
