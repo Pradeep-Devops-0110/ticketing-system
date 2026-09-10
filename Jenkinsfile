@@ -30,7 +30,7 @@ pipeline {
         stage('debug'){
             steps{
                 sh 'pwd'
-                sh 'ls-a'
+                sh 'ls -a'
                 sh 'find , --name "*.yaml"'
             }
         }
