@@ -2,46 +2,65 @@ pipeline {
     agent any
 
     environment {
+        DOCKERHUB_USER = 'pradeep' // Replace with your Docker Hub username
         IMAGE_NAME = 'ticketing-system'
         IMAGE_TAG = "v${BUILD_NUMBER}"
-        KUBECONFIG = '/var/jenkins_home/.kube/config'
-        GIT_CONFIG_PARAMETERS = "'safe.directory=*'"
+        GITOPS_REPO = 'https://github.com/Pradeep-Devops-0110/ticketing-system-gitops.git'
     }
 
     stages {
         stage('Checkout') {
-            steps{
+            steps {
                 deleteDir()
                 git branch: 'main',
-                url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
+                    url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
                     credentialsId: 'Git-build'
             }
         }
-        stage('Build Docker Image') {
+
+        stage('Build & Push Docker Image') {
             steps {
                 script {
-                    echo "Building Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
+                    echo "Building Docker Image: ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
+                    
+                    // Push image to Docker Hub so Kubernetes nodes can pull it
+                    // Un-comment if you have Docker Hub credentials set up in Jenkins:
+                    /*
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                        sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
+                    }
+                    */
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Update GitOps Repository') {
             steps {
-                script {
-                    echo "Deploying to Kubernetes cluster..."
-                    // மேனிஃபெஸ்ட் ஃபைலில் புதிய Image Tag-ஐப் புதுப்பித்து Apply செய்தல்
-                    sh "sed -i 's|image: ticketing-system:.*|image: ${IMAGE_NAME}:${IMAGE_TAG}|g' k8s-deployment.yaml"
-                    sh "kubectl apply -f k8s-deployment.yaml --validate=false"
-                }
-            }
-        }
+                dir('gitops-repo') {
+                    script {
+                        // 1. Clone the GitOps repository using stored credentials
+                        git branch: 'main',
+                            url: "${GITOPS_REPO}",
+                            credentialsId: 'Git-build'
 
-        stage('Verify Deployment') {
-            steps {
-                script {
-                    sh "kubectl rollout status deployment/ticketing-system-deployment"
+                        // 2. Update the image tag inside deployment.yaml
+                        sh "sed -i 's|image: .*|image: ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml"
+
+                        // 3. Commit and push the changes back to GitHub
+                        withCredentials([usernamePassword(credentialsId: 'Git-build', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                            sh """
+                                git config user.email "jenkins@local"
+                                git config user.name "Jenkins CI"
+                                git add deployment.yaml
+                                git commit -m "Automated update: image tag to ${IMAGE_TAG}" || echo "No changes to commit"
+                                git push https://${GIT_USER}:${GIT_PASS}@github.com/Pradeep-Devops-0110/ticketing-system-gitops.git main
+                            """
+                        }
+                    }
                 }
             }
         }
@@ -49,7 +68,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline executed successfully and app is deployed!'
+            echo 'Pipeline completed successfully! GitOps repository updated. ArgoCD will now sync the cluster.'
         }
         failure {
             echo 'Pipeline failed. Check Jenkins logs for details.'
