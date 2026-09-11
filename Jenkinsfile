@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = 'pradeep' // Replace with your Docker Hub username
+        DOCKERHUB_USER = 'rvp0110' // Replace with your Docker Hub username
         IMAGE_NAME = 'ticketing-system'
         IMAGE_TAG = "v${BUILD_NUMBER}"
         GITOPS_REPO = 'https://github.com/Pradeep-Devops-0110/ticketing-system-gitops.git'
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 dir('gitops-repo') {
                     script {
-                        // 1. Clone the GitOps repository using stored credentials
+                        // 1. Clone the GitOps repository using your existing stored credentials
                         git branch: 'main',
                             url: "${GITOPS_REPO}",
                             credentialsId: 'Git-build'
