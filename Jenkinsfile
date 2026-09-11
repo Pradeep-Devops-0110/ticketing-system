@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = 'rvp0110' // Replace with your Docker Hub username
+        DOCKERHUB_USER = 'rvp0110'
         IMAGE_NAME = 'ticketing-system'
         IMAGE_TAG = "v${BUILD_NUMBER}"
         GITOPS_REPO = 'https://github.com/Pradeep-Devops-0110/ticketing-system-gitops.git'
@@ -14,7 +14,7 @@ pipeline {
                 deleteDir()
                 git branch: 'main',
                     url: 'https://github.com/Pradeep-Devops-0110/ticketing-system.git',
-                    credentialsId: 'Git-build'
+                    credentialsId: 'pradeep'
             }
         }
 
@@ -24,16 +24,6 @@ pipeline {
                     echo "Building Docker Image: ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
                     sh "docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ."
                     sh "docker tag ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
-                    
-                    // Push image to Docker Hub so Kubernetes nodes can pull it
-                    // Un-comment if you have Docker Hub credentials set up in Jenkins:
-                    /*
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
-                        sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
-                        sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
-                    }
-                    */
                 }
             }
         }
@@ -42,16 +32,16 @@ pipeline {
             steps {
                 dir('gitops-repo') {
                     script {
-                        // 1. Clone the GitOps repository using your existing stored credentials
+                        // 1. Clone the GitOps repository using the 'pradeep' credential
                         git branch: 'main',
                             url: "${GITOPS_REPO}",
-                            credentialsId: 'Git-build'
+                            credentialsId: 'pradeep'
 
                         // 2. Update the image tag inside deployment.yaml
                         sh "sed -i 's|image: .*|image: ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}|g' deployment.yaml"
 
-                        // 3. Commit and push the changes back to GitHub
-                        withCredentials([usernamePassword(credentialsId: 'Git-build', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        // 3. Commit and push the changes back to GitHub using 'pradeep' credential
+                        withCredentials([usernamePassword(credentialsId: 'pradeep', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
                             sh """
                                 git config user.email "jenkins@local"
                                 git config user.name "Jenkins CI"
