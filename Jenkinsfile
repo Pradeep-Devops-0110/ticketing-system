@@ -31,7 +31,7 @@ stage('Build & Push Docker Image') {
                     
                     // Push image to Docker Hub so Kind/K8s can pull it
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                        sh "echo \"\$DOCKER_PASS\" | docker login -u \"\$DOCKER_USER\" --password-stdin"
                         sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
                         sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:latest"
                     }
