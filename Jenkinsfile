@@ -39,7 +39,7 @@ pipeline {
                 script {
                     // Extract replicas count directly from the application repo's deployment.yaml
                     def REPLICAS_COUNT = sh(
-                        script: "grep -E '^[[:space:]]*replicas:' deployment.yaml | awk '{print \$2}'",
+                        script: "grep -E '^[[:space:]]*replicas:' k8s-deployment.yaml | awk '{print \$2}'",
                         returnStdout: true
                     ).trim() ?: '2'
 
